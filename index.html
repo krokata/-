@@ -2,82 +2,79 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Υπολογισμός Συνολικού Ποσοστού</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
             background: #eef2f7; 
-            display: flex; 
-            justify-content: center; 
-            padding: 20px;
             margin: 0;
+            display: flex;
+            justify-content: center;
         }
         .card { 
             background: white; 
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            padding: 15px; 
             width: 100%; 
             max-width: 450px; 
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header i { font-size: 40px; color: #d93025; margin-bottom: 10px; }
-        h2 { 
-            color: #202124; 
-            font-size: 1.3rem; 
-            margin: 0;
-            line-height: 1.4;
-        }
-        .input-group { margin-bottom: 12px; position: relative; }
-        label { 
-            display: block; 
-            margin-bottom: 5px; 
-            font-size: 0.9rem;
-            color: #5f6368; 
-            font-weight: 500;
-        }
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-size: 18px;
-            transition: border-color 0.3s;
-            outline: none;
-        }
-        input:focus { border-color: #1a73e8; }
+        .header { text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .header i { font-size: 24px; color: #d93025; }
+        h2 { color: #202124; font-size: 1rem; margin: 0; }
+
+        /* ΤΟ ΑΠΟΤΕΛΕΣΜΑ ΤΩΡΑ ΕΙΝΑΙ ΨΗΛΑ */
         .result-box { 
             background: #1a73e8; 
             color: white;
-            padding: 20px; 
+            padding: 15px; 
             border-radius: 15px; 
             text-align: center; 
-            margin-top: 25px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+            position: sticky;
+            top: 10px;
+            z-index: 10;
         }
-        .result-label { font-size: 0.9rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
-        .result-val { font-size: 36px; font-weight: bold; margin-top: 5px; }
-        .info-text { 
-            font-size: 12px; 
-            color: #70757a; 
-            margin-top: 20px; 
-            text-align: center; 
-            line-height: 1.5;
-            font-style: italic;
+        .result-label { font-size: 0.8rem; opacity: 0.9; text-transform: uppercase; }
+        .result-val { font-size: 32px; font-weight: bold; }
+
+        .input-group { margin-bottom: 8px; }
+        label { 
+            display: block; 
+            margin-bottom: 2px; 
+            font-size: 0.85rem;
+            color: #5f6368; 
         }
-        /* Style για το κουμπί καθαρισμού */
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-size: 16px;
+            outline: none;
+        }
+        input:focus { border-color: #1a73e8; background: #f8fbff; }
+        
         .reset-btn {
-            background: none;
+            background: #f1f3f4;
             border: none;
-            color: #1a73e8;
+            color: #5f6368;
+            padding: 8px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9rem;
-            text-decoration: underline;
-            display: block;
-            margin: 10px auto 0;
+            font-size: 0.8rem;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .info-text { 
+            font-size: 11px; 
+            color: #70757a; 
+            margin-top: 15px; 
+            text-align: center; 
         }
     </style>
 </head>
@@ -86,7 +83,12 @@
 <div class="card">
     <div class="header">
         <i class="fas fa-heartbeat"></i>
-        <h2>Υπολογισμός Συνολικού Ποσοστού Αναπηρίας από πολλαπλές παθήσεις</h2>
+        <h2>Υπολογισμός Συνολικού Ποσοστού</h2>
+    </div>
+
+    <div class="result-box">
+        <div class="result-label">Συνολική Αναπηρία</div>
+        <div class="result-val" id="total">0%</div>
     </div>
 
     <div id="inputs">
@@ -99,13 +101,8 @@
 
     <button class="reset-btn" onclick="resetAll()">Καθαρισμός όλων</button>
 
-    <div class="result-box">
-        <div class="result-label">Τελικό Ποσοστό</div>
-        <div class="result-val" id="total">0%</div>
-    </div>
-
     <p class="info-text">
-        Ο υπολογισμός πραγματοποιείται με βάση τη μέθοδο των διαδοχικών μειώσεων (κανόνας Balthazar), όπως ορίζεται στον Ενιαίο Πίνακα Προσδιορισμού Ποσοστού Αναπηρίας.
+        Μέθοδος διαδοχικών μειώσεων (Balthazar).
     </p>
 </div>
 
@@ -115,20 +112,18 @@ function calculate() {
     let values = Array.from(inputs)
                       .map(i => parseFloat(i.value) || 0)
                       .filter(v => v > 0)
-                      .sort((a, b) => b - a); // Ταξινόμηση από το μεγαλύτερο στο μικρότερο
+                      .sort((a, b) => b - a);
 
     if (values.length === 0) {
         document.getElementById('total').innerText = "0%";
         return;
     }
 
-    // Ο τύπος: Συνολικό = Α + [(100-Α)*Β]/100
     let total = values[0];
     for (let i = 1; i < values.length; i++) {
         total = total + ((100 - total) * values[i] / 100);
     }
 
-    // Στρογγυλοποίηση στο πλησιέστερο ακέραιο (όπως κάνει συνήθως το ΚΕΠΑ)
     document.getElementById('total').innerText = Math.round(total) + "%";
 }
 
