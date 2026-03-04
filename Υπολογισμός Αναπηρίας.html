@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Υπολογισμός Συνολικού Ποσοστού</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: #eef2f7; 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px;
+            margin: 0;
+        }
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 450px; 
+        }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header i { font-size: 40px; color: #d93025; margin-bottom: 10px; }
+        h2 { 
+            color: #202124; 
+            font-size: 1.3rem; 
+            margin: 0;
+            line-height: 1.4;
+        }
+        .input-group { margin-bottom: 12px; position: relative; }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-size: 0.9rem;
+            color: #5f6368; 
+            font-weight: 500;
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-size: 18px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        input:focus { border-color: #1a73e8; }
+        .result-box { 
+            background: #1a73e8; 
+            color: white;
+            padding: 20px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-top: 25px;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+        .result-label { font-size: 0.9rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .result-val { font-size: 36px; font-weight: bold; margin-top: 5px; }
+        .info-text { 
+            font-size: 12px; 
+            color: #70757a; 
+            margin-top: 20px; 
+            text-align: center; 
+            line-height: 1.5;
+            font-style: italic;
+        }
+        /* Style για το κουμπί καθαρισμού */
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #1a73e8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            display: block;
+            margin: 10px auto 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <i class="fas fa-heartbeat"></i>
+        <h2>Υπολογισμός Συνολικού Ποσοστού Αναπηρίας από πολλαπλές παθήσεις</h2>
+    </div>
+
+    <div id="inputs">
+        <div class="input-group"><label>1η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
+        <div class="input-group"><label>2η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
+        <div class="input-group"><label>3η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
+        <div class="input-group"><label>4η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
+        <div class="input-group"><label>5η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
+    </div>
+
+    <button class="reset-btn" onclick="resetAll()">Καθαρισμός όλων</button>
+
+    <div class="result-box">
+        <div class="result-label">Τελικό Ποσοστό</div>
+        <div class="result-val" id="total">0%</div>
+    </div>
+
+    <p class="info-text">
+        Ο υπολογισμός πραγματοποιείται με βάση τη μέθοδο των διαδοχικών μειώσεων (κανόνας Balthazar), όπως ορίζεται στον Ενιαίο Πίνακα Προσδιορισμού Ποσοστού Αναπηρίας.
+    </p>
+</div>
+
+<script>
+function calculate() {
+    let inputs = document.querySelectorAll('.pct');
+    let values = Array.from(inputs)
+                      .map(i => parseFloat(i.value) || 0)
+                      .filter(v => v > 0)
+                      .sort((a, b) => b - a); // Ταξινόμηση από το μεγαλύτερο στο μικρότερο
+
+    if (values.length === 0) {
+        document.getElementById('total').innerText = "0%";
+        return;
+    }
+
+    // Ο τύπος: Συνολικό = Α + [(100-Α)*Β]/100
+    let total = values[0];
+    for (let i = 1; i < values.length; i++) {
+        total = total + ((100 - total) * values[i] / 100);
+    }
+
+    // Στρογγυλοποίηση στο πλησιέστερο ακέραιο (όπως κάνει συνήθως το ΚΕΠΑ)
+    document.getElementById('total').innerText = Math.round(total) + "%";
+}
+
+function resetAll() {
+    let inputs = document.querySelectorAll('.pct');
+    inputs.forEach(input => input.value = "");
+    document.getElementById('total').innerText = "0%";
+}
+</script>
+
+</body>
+</html>
