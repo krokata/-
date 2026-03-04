@@ -6,76 +6,20 @@
     <title>Υπολογισμός Συνολικού Ποσοστού</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: #eef2f7; 
-            margin: 0;
-            display: flex;
-            justify-content: center;
-        }
-        .card { 
-            background: white; 
-            padding: 15px; 
-            width: 100%; 
-            max-width: 450px; 
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #eef2f7; margin: 0; display: flex; justify-content: center; }
+        .card { background: white; padding: 15px; width: 100%; max-width: 450px; min-height: 100vh; box-sizing: border-box; }
         .header { text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .header i { font-size: 24px; color: #d93025; }
         h2 { color: #202124; font-size: 1rem; margin: 0; }
-
-        /* ΤΟ ΑΠΟΤΕΛΕΣΜΑ ΤΩΡΑ ΕΙΝΑΙ ΨΗΛΑ */
-        .result-box { 
-            background: #1a73e8; 
-            color: white;
-            padding: 15px; 
-            border-radius: 15px; 
-            text-align: center; 
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
-            position: sticky;
-            top: 10px;
-            z-index: 10;
-        }
+        .result-box { background: #1a73e8; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); position: sticky; top: 10px; z-index: 10; }
         .result-label { font-size: 0.8rem; opacity: 0.9; text-transform: uppercase; }
         .result-val { font-size: 32px; font-weight: bold; }
-
         .input-group { margin-bottom: 8px; }
-        label { 
-            display: block; 
-            margin-bottom: 2px; 
-            font-size: 0.85rem;
-            color: #5f6368; 
-        }
-        input { 
-            width: 100%; 
-            padding: 10px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-size: 16px;
-            outline: none;
-        }
+        label { display: block; margin-bottom: 2px; font-size: 0.85rem; color: #5f6368; }
+        input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; box-sizing: border-box; font-size: 18px; outline: none; inputmode: decimal; }
         input:focus { border-color: #1a73e8; background: #f8fbff; }
-        
-        .reset-btn {
-            background: #f1f3f4;
-            border: none;
-            color: #5f6368;
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .info-text { 
-            font-size: 11px; 
-            color: #70757a; 
-            margin-top: 15px; 
-            text-align: center; 
-        }
+        .reset-btn { background: #f1f3f4; border: none; color: #5f6368; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; width: 100%; margin-top: 10px; font-weight: bold; }
+        .info-text { font-size: 11px; color: #70757a; margin-top: 15px; text-align: center; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -92,21 +36,44 @@
     </div>
 
     <div id="inputs">
-        <div class="input-group"><label>1η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
-        <div class="input-group"><label>2η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
-        <div class="input-group"><label>3η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
-        <div class="input-group"><label>4η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
-        <div class="input-group"><label>5η Πάθηση %</label><input type="number" class="pct" placeholder="0" oninput="calculate()"></div>
+        <div class="input-group"><label>1η Πάθηση %</label><input type="number" class="pct" placeholder="0" min="0" max="100" oninput="validate(this)"></div>
+        <div class="input-group"><label>2η Πάθηση %</label><input type="number" class="pct" placeholder="0" min="0" max="100" oninput="validate(this)"></div>
+        <div class="input-group"><label>3η Πάθηση %</label><input type="number" class="pct" placeholder="0" min="0" max="100" oninput="validate(this)"></div>
+        <div class="input-group"><label>4η Πάθηση %</label><input type="number" class="pct" placeholder="0" min="0" max="100" oninput="validate(this)"></div>
+        <div class="input-group"><label>5η Πάθηση %</label><input type="number" class="pct" placeholder="0" min="0" max="100" oninput="validate(this)"></div>
     </div>
 
-    <button class="reset-btn" onclick="resetAll()">Καθαρισμός όλων</button>
+    <button class="reset-btn" onclick="resetAll()">ΚΑΘΑΡΙΣΜΟΣ</button>
 
     <p class="info-text">
-        Μέθοδος διαδοχικών μειώσεων (Balthazar).
+        Υπολογισμός με τη μέθοδο Balthazar.<br>
+        Τα ποσοστά περιορίζονται μεταξύ 0% και 100%.
     </p>
 </div>
 
 <script>
+// Έλεγχος για όρια 0-100 και υπολογισμός
+function validate(el) {
+    if (el.value > 100) el.value = 100;
+    if (el.value < 0) el.value = 0;
+    calculate();
+}
+
+// Λειτουργία Enter για επόμενο πεδίο
+document.querySelectorAll('.pct').forEach((input, index, list) => {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            let next = list[index + 1];
+            if (next) {
+                next.focus();
+            } else {
+                input.blur(); // Κλείνει το πληκτρολόγιο στο τελευταίο
+            }
+        }
+    });
+});
+
 function calculate() {
     let inputs = document.querySelectorAll('.pct');
     let values = Array.from(inputs)
