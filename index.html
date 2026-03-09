@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Υπολογιστής ΑμεΑ</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056b3">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        body { font-family: sans-serif; background-color: #eef2f3; display: flex; justify-content: center; padding: 20px; padding-bottom: 500px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 380px; text-align: center; }
+        h2 { color: #0056b3; font-size: 20px; margin-bottom: 20px; }
+        
+        /* Το κουμπί εγκατάστασης - Πράσινο και έντονο */
+        #installBtn { 
+            width: 100%; padding: 16px; background-color: #28a745; color: white; 
+            border: none; border-radius: 12px; font-size: 16px; font-weight: bold; 
+            display: none; margin-bottom: 20px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .input-group { margin-bottom: 12px; text-align: left; }
+        label { font-size: 13px; color: #666; font-weight: bold; margin-left: 5px; }
+        input { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 12px; font-size: 18px; box-sizing: border-box; }
+        
+        #result-box { margin-top: 25px; padding: 20px; background: #ffffff; border-radius: 15px; border: 4px solid #d9534f; }
+        #result { font-size: 48px; font-weight: bold; color: #d9534f; }
+        .result-label { font-size: 16px; color: #0056b3; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <button id="installBtn">ΕΓΚΑΤΑΣΤΑΣΗ ΕΦΑΡΜΟΓΗΣ 📲</button>
+    
+    <h2>Υπολογιστής Αναπηρίας</h2>
+    
+    <div id="inputs">
+        <div class="input-group"><label>1ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
+        <div class="input-group"><label>2ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
+        <div class="input-group"><label>3ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
+        <div class="input-group"><label>4ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
+        <div class="input-group"><label>5ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
+        <div class="input-group"><label>6ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
+    </div>
+
+    <div id="result-box">
+        <div class="result-label">Συνολικό Ποσοστό:</div>
+        <div id="result">0%</div>
+    </div>
+</div>
+
+<script>
+    function check(el) { 
+        if (el.value > 100) el.value = 100; 
+        if (el.value < 0) el.value = 0; 
+    }
+
+    function calc() {
+        let inputs = document.querySelectorAll('.pct');
+        let vals = [];
+        inputs.forEach(i => { 
+            let v = parseFloat(i.value) || 0; 
+            if (v > 0) vals.push(v); 
+        });
+        if (vals.length === 0) { 
+            document.getElementById('result').innerText = "0%"; 
+            return; 
+        }
+        vals.sort((a, b) => b - a);
+        let total = vals[0];
+        for (let i = 1; i < vals.length; i++) { 
+            total = total + (vals[i] * (100 - total) / 100); 
+        }
+        document.getElementById('result').innerText = Math.round(total) + "%";
+    }
+
+    // SERVICE WORKER & INSTALL LOGIC
+    let deferredPrompt;
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(() => {
+            console.log("Service Worker Active");
+        });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Εμφάνιση του κουμπιού
+        document.getElementById('installBtn').style.display = 'block';
+    });
+
+    document.getElementById('installBtn').addEventListener('click', () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    document.getElementById('installBtn').style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
