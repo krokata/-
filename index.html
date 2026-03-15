@@ -8,11 +8,10 @@
     <meta name="theme-color" content="#0056b3">
     <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        body { font-family: sans-serif; background-color: #eef2f3; display: flex; justify-content: center; padding: 20px; padding-bottom: 500px; }
+        body { font-family: sans-serif; background-color: #eef2f3; display: flex; justify-content: center; padding: 20px; padding-bottom: 100px; }
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 380px; text-align: center; }
         h2 { color: #0056b3; font-size: 20px; margin-bottom: 20px; }
         
-        /* Το κουμπί εγκατάστασης - Πράσινο και έντονο */
         #installBtn { 
             width: 100%; padding: 16px; background-color: #28a745; color: white; 
             border: none; border-radius: 12px; font-size: 16px; font-weight: bold; 
@@ -22,11 +21,20 @@
 
         .input-group { margin-bottom: 12px; text-align: left; }
         label { font-size: 13px; color: #666; font-weight: bold; margin-left: 5px; }
-        input { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 12px; font-size: 18px; box-sizing: border-box; }
+        input { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #0056b3; }
         
         #result-box { margin-top: 25px; padding: 20px; background: #ffffff; border-radius: 15px; border: 4px solid #d9534f; }
         #result { font-size: 48px; font-weight: bold; color: #d9534f; }
         .result-label { font-size: 16px; color: #0056b3; font-weight: bold; }
+
+        /* Στυλ για το κουμπί Reset */
+        #resetBtn {
+            width: 100%; margin-top: 15px; padding: 12px; background-color: #f8f9fa; color: #d9534f;
+            border: 2px solid #d9534f; border-radius: 12px; font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+        }
+        #resetBtn:hover { background-color: #d9534f; color: white; }
     </style>
 </head>
 <body>
@@ -45,6 +53,8 @@
         <div class="input-group"><label>6ο Ποσοστό %</label><input type="number" class="pct" oninput="check(this); calc()"></div>
     </div>
 
+    <button id="resetBtn">Εκκαθάριση / Reset</button>
+
     <div id="result-box">
         <div class="result-label">Συνολικό Ποσοστό:</div>
         <div id="result">0%</div>
@@ -52,11 +62,13 @@
 </div>
 
 <script>
+    // Έλεγχος ορίων (0-100)
     function check(el) { 
         if (el.value > 100) el.value = 100; 
         if (el.value < 0) el.value = 0; 
     }
 
+    // Υπολογισμός συνολικού ποσοστού
     function calc() {
         let inputs = document.querySelectorAll('.pct');
         let vals = [];
@@ -76,6 +88,30 @@
         document.getElementById('result').innerText = Math.round(total) + "%";
     }
 
+    // Λειτουργία Reset
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        const inputs = document.querySelectorAll('.pct');
+        inputs.forEach(input => input.value = '');
+        document.getElementById('result').innerText = "0%";
+        inputs[0].focus(); // Επιστροφή στο πρώτο πεδίο
+    });
+
+    // Λειτουργία Enter για μετάβαση στο επόμενο πεδίο
+    const inputFields = document.querySelectorAll('.pct');
+    inputFields.forEach((input, index) => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const nextInput = inputFields[index + 1];
+                if (nextInput) {
+                    nextInput.focus();
+                } else {
+                    input.blur(); // Κλείσιμο πληκτρολογίου στο τελευταίο πεδίο
+                }
+            }
+        });
+    });
+
     // SERVICE WORKER & INSTALL LOGIC
     let deferredPrompt;
     
@@ -88,7 +124,6 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // Εμφάνιση του κουμπιού
         document.getElementById('installBtn').style.display = 'block';
     });
 
